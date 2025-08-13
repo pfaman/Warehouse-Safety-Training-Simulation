@@ -29,16 +29,21 @@ public class ChecklistManager : MonoBehaviour
     /// Call this once per item (e.g., from ItemHoverGlow.Start()).
     /// Creates a row if it doesn't already exist.
     /// </summary>
+
     public void RegisterItem(string itemName)
     {
         if (string.IsNullOrWhiteSpace(itemName)) return;
         if (rows.ContainsKey(itemName)) return;
 
         var row = Instantiate(rowPrefab, listParent);
-       // row.name = $"Row_{itemName}";
         row.name = itemName;
 
-        var statusText = row.transform.Find("StatusText")?.GetComponentInChildren<TextMeshProUGUI>();
+        // Find specific child objects
+        //var nameText = row.transform.Find("NameText")?.GetComponent<TextMeshProUGUI>();
+        var statusText = row.transform.Find("StatusText")?.GetComponent<TextMeshProUGUI>();
+
+        ///
+
 
         Debug.Log("itemName" + itemName);
 
@@ -47,21 +52,26 @@ public class ChecklistManager : MonoBehaviour
         {
             nameText.text = itemName;
         }
-        
-        if (statusText != null) statusText.text = "Pending";
+
+        Debug.Log("itemName: " + itemName);
+
+/*        if (nameText != null)
+            nameText.text = itemName;*/
+
+        if (statusText != null)
+            statusText.text = "Pending";
 
         rows[itemName] = row;
     }
 
-    /// <summary>
-    /// Mark an item as inspected; updates status text and enables Proceed when all done.
-    /// </summary>
     public void MarkInspected(string itemName)
     {
         if (string.IsNullOrWhiteSpace(itemName)) return;
         if (!rows.ContainsKey(itemName)) return;
 
-        var statusText = rows[itemName].GetComponentInChildren<TextMeshProUGUI>();
+        var row = rows[itemName];
+
+        var statusText = row.transform.Find("StatusText")?.GetComponent<TextMeshProUGUI>();
 
         if (statusText != null)
         {
@@ -76,6 +86,7 @@ public class ChecklistManager : MonoBehaviour
         completed.Add(itemName);
         CheckAllCompleted();
     }
+
 
     private void CheckAllCompleted()
     {
