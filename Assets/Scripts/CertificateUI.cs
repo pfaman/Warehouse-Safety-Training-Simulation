@@ -17,9 +17,12 @@ public class CertificateUI : MonoBehaviour
 
     public void ShowCertificate(string learnerName = "Learner", string course = "Warehouse Safety Training")
     {
+        Debug.Log("ShowCertificate");
         if (certificatePanel == null) return;
         learnerNameText.text = learnerName;
         courseText.text = course;
         certificatePanel.SetActive(true);
+        Debug.Log("ShowCertificate2");
+
     }
 }

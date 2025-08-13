@@ -114,7 +114,7 @@ public class Scene2Manager : MonoBehaviour
         if (timerText == null) return;
         int mins = Mathf.FloorToInt(timeRemaining / 60f);
         int secs = Mathf.FloorToInt(timeRemaining % 60f);
-        timerText.text = $"{mins:00}:{secs:00}";
+        timerText.text = "Left Time :" + $"{mins:00}:{secs:00}";
     }
     #endregion
 
