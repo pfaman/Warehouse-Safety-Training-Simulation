@@ -262,6 +262,8 @@ public class Scene2Manager : MonoBehaviour
 
     void OnAllItemsPlaced()
     {
+        LMSManager.Instance?.SendProgress("PackagingTask", 100f);
+
         ShowInstruction("All items placed! Preparing quiz...");
         if (timerRoutine != null) StopCoroutine(timerRoutine); // stop timer
         OpenQuiz();

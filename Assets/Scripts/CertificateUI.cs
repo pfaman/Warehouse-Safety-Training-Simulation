@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CertificateUI : MonoBehaviour
@@ -12,9 +13,16 @@ public class CertificateUI : MonoBehaviour
     void Start()
     {
         if (certificatePanel != null) certificatePanel.SetActive(false);
-        if (closeButton != null) closeButton.onClick.AddListener(() => certificatePanel.SetActive(false));
+        if (closeButton != null) closeButton.onClick.AddListener(CloseCertificate);
+
+
     }
 
+    public void CloseCertificate()
+    {
+        certificatePanel.SetActive(false);
+        SceneManager.LoadScene(0);
+    }
     public void ShowCertificate(string learnerName = "Learner", string course = "Warehouse Safety Training")
     {
         Debug.Log("ShowCertificate");

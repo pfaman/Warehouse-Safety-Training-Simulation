@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Classroom Safety/DemoScene/Scene1Classroom_Safety.unity
+    path: Assets/Scenes/Scene1Classroom_Safety.unity
     guid: 378551c9dbb787b4f9dd2e04ec1454e5
   - enabled: 1
-    path: Assets/Warehouse/Scenes/Scene2_Warehouse.unity
+    path: Assets/Scenes/Scene2_Warehouse.unity
     guid: 2d4d181b8e7363346b02977ff0fa8e0c
   m_configObjects: {}
