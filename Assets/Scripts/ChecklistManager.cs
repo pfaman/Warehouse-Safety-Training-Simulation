@@ -99,7 +99,6 @@ public class ChecklistManager : MonoBehaviour
     // Wire this to ProceedButton.OnClick
     public void OnProceed()
     {
-        // Optional: LMS reporting hook
         if (LMSManager.Instance != null)
             LMSManager.Instance.SendProgress("TrayInspection", 100f);
 

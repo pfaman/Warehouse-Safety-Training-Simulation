@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.Video;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Collider))]
 public class ItemHoverGlow : MonoBehaviour
 {
     [Header("Item Info")]
-    public string itemName;  // Added item name
-    public VideoClip hoverVideoClip; // Video that should play when hovered
+    public string itemName;
+    public VideoClip hoverVideoClip;
 
     [Header("Glow")]
     public bool useHighlightMaterial = true;
@@ -19,58 +20,60 @@ public class ItemHoverGlow : MonoBehaviour
     public VideoPlayer projectorVideo;
     public AudioSource projectorAudioSource;
 
-    Renderer rend;
-    Material[] originalMaterials;
-    Material[] glowMaterials;
+    private Renderer[] renderers;
+    private List<Material[]> originalMaterials = new List<Material[]>();
+    private List<Material[]> glowMaterials = new List<Material[]>();
 
     void Awake()
     {
-        rend = GetComponent<Renderer>();
-        if (rend == null) rend = GetComponentInChildren<Renderer>();
+        // Get all renderers in this object and its children
+        renderers = GetComponentsInChildren<Renderer>();
 
-        if (rend != null)
+        foreach (Renderer r in renderers)
         {
-            originalMaterials = rend.materials;
-            glowMaterials = new Material[originalMaterials.Length];
-            for (int i = 0; i < originalMaterials.Length; i++)
+            // Store original
+            originalMaterials.Add(r.materials);
+
+            // Prepare glow versions
+            Material[] glowMats = new Material[r.materials.Length];
+            for (int i = 0; i < r.materials.Length; i++)
             {
-                Material m = new Material(originalMaterials[i]);
+                Material m = new Material(r.materials[i]);
                 if (m.HasProperty("_EmissionColor"))
                 {
                     m.EnableKeyword("_EMISSION");
                     m.SetColor("_EmissionColor", emissionColor * emissionIntensity);
                 }
-                glowMaterials[i] = m;
+                glowMats[i] = m;
             }
+            glowMaterials.Add(glowMats);
         }
 
+        // Setup video
         if (projectorVideo != null)
         {
             projectorVideo.audioOutputMode = VideoAudioOutputMode.AudioSource;
-
             if (projectorAudioSource != null)
             {
                 projectorVideo.SetTargetAudioSource(0, projectorAudioSource);
                 projectorAudioSource.playOnAwake = false;
-                projectorAudioSource.volume = 1f;
             }
         }
     }
 
     private void Start()
     {
-        // safe auto-register; manager must be in scene before items Start() (place Managers high in hierarchy)
         if (ChecklistManager.Instance != null && !string.IsNullOrWhiteSpace(itemName))
             ChecklistManager.Instance.RegisterItem(itemName);
     }
 
     void OnMouseEnter()
     {
+       
         SetGlow(true);
 
         if (playProjectorVideoOnHover && projectorVideo != null)
         {
-            // Assign hover video dynamically
             if (hoverVideoClip != null)
                 projectorVideo.clip = hoverVideoClip;
 
@@ -79,12 +82,9 @@ public class ItemHoverGlow : MonoBehaviour
 
             if (projectorAudioSource != null)
             {
-                projectorAudioSource.volume = 1f;
-                projectorAudioSource.Stop(); // reset to start
+                projectorAudioSource.Stop();
                 projectorAudioSource.Play();
             }
-
-            Debug.Log("Hovering over: " + itemName);
         }
     }
 
@@ -96,44 +96,41 @@ public class ItemHoverGlow : MonoBehaviour
         }
     }
 
-
     void OnMouseExit()
     {
         SetGlow(false);
-        // Optionally pause the video
-        // if (playProjectorVideoOnHover && projectorVideo != null) projectorVideo.Pause();
     }
 
     void SetGlow(bool on)
     {
-        if (rend == null) return;
-        if (on)
+        for (int i = 0; i < renderers.Length; i++)
         {
-            if (useHighlightMaterial && highlightMaterial != null)
+            if (on)
             {
-                Material[] mats = new Material[rend.materials.Length];
-                for (int i = 0; i < mats.Length; i++) mats[i] = highlightMaterial;
-                rend.materials = mats;
+                if (useHighlightMaterial && highlightMaterial != null)
+                {
+                    Material[] mats = new Material[renderers[i].materials.Length];
+                    for (int m = 0; m < mats.Length; m++)
+                        mats[m] = highlightMaterial;
+                    renderers[i].materials = mats;
+                }
+                else
+                {
+                    renderers[i].materials = glowMaterials[i];
+                }
             }
-            else if (glowMaterials != null)
+            else
             {
-                rend.materials = glowMaterials;
-            }
-        }
-        else
-        {
-            if (originalMaterials != null)
-            {
-                rend.materials = originalMaterials;
+                renderers[i].materials = originalMaterials[i];
             }
         }
     }
 
     void OnDestroy()
     {
-        if (glowMaterials != null)
+        foreach (var mats in glowMaterials)
         {
-            foreach (var m in glowMaterials)
+            foreach (var m in mats)
                 if (m != null) Destroy(m);
         }
     }

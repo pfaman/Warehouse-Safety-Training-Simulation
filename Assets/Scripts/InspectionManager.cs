@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InspectionManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class InspectionManager : MonoBehaviour
     public bool IsInspecting => isInspecting;
 
     // runtime
-    private bool isInspecting = false;
+    public bool isInspecting = false;
     private ItemHoverGlow currentItem;   // the item script you already use
     private Transform originalParent;
     private Vector3 originalPosition;
@@ -26,8 +27,11 @@ public class InspectionManager : MonoBehaviour
     private Collider[] itemColliders;
     private DragRotate dragRotate;
 
+    [SerializeField] Button backButton;
+
     void Awake()
     {
+        backButton.gameObject.SetActive(true);
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
 
